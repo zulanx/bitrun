@@ -1,27 +1,36 @@
 /** @param {NS} ns **/
 export async function main(ns) {
-	var scrapt = "easyHack.js";
-	var attackTarget = ns.args[1];
-	var target = ns.args[0];
-	var threads = Math.floor( ns.getServerMaxRam(target) / ns.getScriptRam(scrapt));
+	ns.disableLog("ALL");
+	var target = '';
+	if (ns.args[0] == undefined) { target=ns.getHostname() } else { target = ns.args[0] };
 	
-	await ns.killall(target);
-	await ns.sleep(1000);
-		
-	if (ns.fileExists("BruteSSH.exe")) { await ns.brutessh(target) };
-	if (ns.fileExists("FTPCrack.exe")) { await ns.ftpcrack(target) };
-	if (ns.fileExists("HTTPWorm.exe")) { await ns.httpworm(target) };
-	if (ns.fileExists("SQLInject.exe")) { await ns.sqlinject(target) };
-	if (ns.fileExists("relaySMTP.exe")) { await ns.relaysmtp(target) };
+	var maxMoney = ns.getServerMaxMoney(target) * .85;
+	var maxSecurity = ns.getServerMinSecurityLevel(target) + 5;
+	var loopCNT = 1;
+	var srvSec = 0;
+	var curMoney = 0;
+	while (true) {
+		ns.clearLog();
+		srvSec = ns.getServerSecurityLevel(target);
+		curMoney = ns.getServerMoneyAvailable(target);
+		if (Math.floor(srvSec) > maxSecurity) {
+			ns.print("Target Security Too High: Weakening (" + srvSec + "/" + maxSecurity)
+			ns.print("Loop: " + loopCNT);
+			await ns.weaken(target);
 
-	await ns.nuke(target);
-	ns.tprint(target + " Nuked");
+		} else if (maxMoney >= curMoney) {
+			ns.print("Server is too poor: Growing (" + curMoney + "/" + maxMoney);
+			ns.print("Loop: " + loopCNT);
+			await ns.grow(target);
 
-	await ns.scp(scrapt,"home",target);
-	ns.tprint(scrapt+" File Copied to: "+target);
-	
-	await ns.exec(scrapt,target,threads,attackTarget);
-	ns.tprint("Target: "+attackTarget+"\nScript Started: "+threads+" Threads");
-	
-	return "complete"
+		} else {
+			ns.print("Server is RIPE!: Hacking");
+			ns.print("Loop: " + loopCNT);
+			await ns.hack(target);
+		}
+
+		loopCNT++
+
+	}
+
 }

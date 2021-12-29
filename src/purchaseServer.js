@@ -7,6 +7,10 @@ export async function main(ns) {
 	const maxNumServers = ns.getPurchasedServerLimit();
 	const maxMoney = ns.getServerMoneyAvailable('home');
 	const maxRAM = ns.getPurchasedServerMaxRam('home');
+	var scrapt = 'sendIT.js';
+	var scraptTarget = 'n00dles';
+
+	var theChoice = await ns.prompt('Execute ' + scrapt + ' after purchse of new server?');
 
 	if (maxMoney > serverCostMulti * ramToBuy) {
 		ramToBuy *= 2;
@@ -27,7 +31,7 @@ export async function main(ns) {
 			if (!ns.serverExists('pserv-' + i) || ns.getServerMaxRam('pserv-' + i) < ramToBuy) {
 				if (ns.serverExists('pserv-' + i)) {
 					ns.killall('pserv-'+i);
-					await ns.spleep(8000);
+					await ns.sleep(8000);
 					ns.tprint('Killing Server: pserv-' +i)
 					ns.deleteServer('pserv-'+i);
 					await ns.sleep(5000);
@@ -37,7 +41,11 @@ export async function main(ns) {
                     if (pServer) {
 
                         ns.tprint('Bought player server #' + i + ' with ' + ramToBuy + ' GB RAM for $' + serverCostMulti * ramToBuy);
-                        ++i;
+                        if (theChoice) {
+							ns.tprint('Starting ' + scrapt + ' on pserv-'+i + ' agaisnt ' + scraptTarget);
+							ns.run(scrapt,'home',1,'easyHack.js','pserv-'+i,scraptTarget);
+						}
+						++i;
                     }
                 }
                 await ns.sleep(500);

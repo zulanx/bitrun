@@ -5,15 +5,17 @@ export async function main(ns) {
 	var target = ns.args[0];
 	var threads = Math.floor( ns.getServerMaxRam(target) / ns.getScriptRam(scrapt));
 	
-	if (ns.fileExists("BruteSSH.exe")) { await ns.brutessh(target) };
-	if (ns.fileExists("FTPCrack.exe")) { await ns.ftpcrack(target) };
-	if (ns.fileExists("HTTPWorm.exe")) { await ns.httpworm(target) };
-	if (ns.fileExists("SQLInject.exe")) { await ns.sqlinject(target) };
-	if (ns.fileExists("relaySMTP.exe")) { await ns.relaysmtp(target) };
+	await ns.killall(target);
+	await ns.sleep(1000);
+	
+	if (ns.fileExists("BruteSSH.exe")) { ns.brutessh(target) };
+	if (ns.fileExists("FTPCrack.exe")) { ns.ftpcrack(target) };
+	if (ns.fileExists("HTTPWorm.exe")) { ns.httpworm(target) };
+	if (ns.fileExists("SQLInject.exe")) { ns.sqlinject(target) };
+	if (ns.fileExists("relaySMTP.exe")) { ns.relaysmtp(target) };
 
-	await ns.nuke(target);
-	ns.tprint(target + " Nuked");
-
+	if (!ns.hasRootAccess) { await ns.nuke(target); ns.tprint(target + " Nuked")};
+	
 	await ns.scp(scrapt,"home",target);
 	ns.tprint(scrapt+" File Copied to: "+target);
 	
