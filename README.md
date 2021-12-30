@@ -10,10 +10,10 @@ export async function main(ns) {
   }
 
   await ns.wget(
-    `https://raw.githubusercontent.com/zulanx/bitrun/main/src/initHacking.ns?ts=${new Date().getTime()}`,
-    "initHacking.ns"
+    `https://raw.githubusercontent.com/zulanx/bitrun/main/src/initFiles.ns?ts=${new Date().getTime()}`,
+    "initFiles.ns"
   );
-  ns.spawn("initHacking.ns", 1);
+  ns.spawn("initFiles.ns", 1);
 }
 ```
 ---------------------------------------------------------------------------------------------------------------------
