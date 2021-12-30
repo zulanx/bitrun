@@ -9,6 +9,7 @@ const filesToDownload = [
   'readme.txt',
   'sendIT.js',
   'spreadIT.js',
+  'watchServer.js',
 ] 
 
 function localeHHMMSS(ms = 0) {
