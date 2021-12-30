@@ -39,6 +39,6 @@ export async function main(ns) {
   }
 
 
-  ns.tprint(`[${localeHHMMSS()}] Spawning killAll.ns`)
-  ns.spawn('killAll.ns', 1, 'runHacking.ns')
+  ns.tprint(`[${localeHHMMSS()}] Spawning spreadIT.js`)
+  ns.spawn('spreadIT.js', 1, n00dles, easyHack.js)
 }
