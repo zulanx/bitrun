@@ -40,5 +40,5 @@ export async function main(ns) {
 
 
   ns.tprint(`[${localeHHMMSS()}] Spawning spreadIT.js`)
-  ns.spawn('spreadIT.js', 1, n00dles, easyHack.js)
+  ns.spawn('spreadIT.js', 1, 'n00dles', 'easyHack.js')
 }

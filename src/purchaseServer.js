@@ -43,7 +43,7 @@ export async function main(ns) {
                         ns.tprint('Bought player server #' + i + ' with ' + ramToBuy + ' GB RAM for $' + serverCostMulti * ramToBuy);
                         if (theChoice) {
 							ns.tprint('Starting ' + scrapt + ' on pserv-'+i + ' agaisnt ' + scraptTarget);
-							ns.run(scrapt,'home',1,'easyHack.js','pserv-'+i,scraptTarget);
+							ns.run(scrapt,1,'easyHack.js','pserv-'+i,scraptTarget);
 						}
 						++i;
                     }
