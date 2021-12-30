@@ -17,7 +17,7 @@ export async function main(ns) {
 	if (ns.fileExists("SQLInject.exe")) { ns.sqlinject(target) };
 	if (ns.fileExists("relaySMTP.exe")) { ns.relaysmtp(target) };
 
-	if (!ns.hasRootAccess) { ns.nuke(target); ns.tprint(target + " Nuked")};
+	if (!ns.hasRootAccess(target)) { ns.nuke(target); ns.tprint(target + " Nuked")};
 	
 	await ns.scp(scrapt,"home",target);
 	ns.tprint(scrapt+" File Copied to: "+target);
