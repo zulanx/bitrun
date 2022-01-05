@@ -8,7 +8,7 @@ export async function main(ns) {
 	var hostname = '';
 	var skippedServers = 'Skipped Servers: ';
 
-	if (ns.args.length < 2) { ns.tprint('Please provide target and script\nex. \'run spreadIT.js n00dles easyHack.js\n'); return 0; }
+	if (ns.args.length < 2) { ns.tprint('Please provide target and script\nex. \'run spreadIT.js n00dles easyHack.js\n\''); return 0; }
 
 
 	var hTools = ['BruteSSH.exe', 'FTPCrack.exe', 'HTTPWorm.exe', 'SQLInject.exe', 'relaySMTP.exe'];
@@ -64,7 +64,7 @@ export async function main(ns) {
 			}
 
 			threads = Math.floor(ns.getServerMaxRam(hostname) / memScrapt);
-			if (threads < 1) { threads = 1 };
+			if (threads == 0) { continue } else if (threads < 1) {threads = 1};
 			await ns.scp(scrapt, 'home', hostname);
 			ns.exec(scrapt, hostname, threads, target);
 			ns.tprint('Success! Started: ' + hostname + ' :: ' + threads + ' threads. :: Target: ' + target)

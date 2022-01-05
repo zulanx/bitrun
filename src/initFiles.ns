@@ -9,7 +9,17 @@ const filesToDownload = [
   'readme.txt',
   'sendIT.js',
   'spreadIT.js',
-  'watchServer.js',
+  'doScan.js',
+  'find_coding_contract.js',
+  'findServer.js',
+  'getServers.js',
+  'getServersOrg.js',
+  'getSF.js',
+  'populateHome.js',
+  'purchaseServer.js',
+  'scanServers.js',
+  'superSendIT.js',
+  'writeServerInfo.js',
 ] 
 
 function localeHHMMSS(ms = 0) {
