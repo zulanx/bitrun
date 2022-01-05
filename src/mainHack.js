@@ -16,7 +16,7 @@ export function list_servers(ns) {
 	scan(ns, '', 'home', sList);
 	var sProps = [];
 	for (let i = 0; i < sList.length; i++) {
-		if (sList[i].substring(0, 6) !== 'pserv-' && ns.getServerMaxMoney(sList[i]) !== 0) {
+		if (sList[i].substring(0, 6) !== 'pserv-' && sList.length > 0) {
 			sProps[i] = [sList[i],
 			ns.hasRootAccess(sList[i]),
 			ns.getServerNumPortsRequired(sList[i]),
@@ -76,14 +76,16 @@ export async function main(ns) {
 			if (ns.fileExists(vHacksName[g])) { vHacks[g] = 1; hackCNT++ } else { vHacks[g] = 0 };
 
 		}
+		ns.print(`${hackCNT} hacks loaded...`)
 		//ns.tprint('Current Server List\n------------------------------------')
 		//ns.tprint(sList);
+		ns.print(`Processing Individual Game Servers...`)
 		for (let i = 0; i < sList.length; i++) {
 			freeMem = homeRam - ns.getServerUsedRam('home') - 100;
 			curSVR = sList[i];
 			//ns.tprint(`Checking: ${curSVR}`);
 			//populate server details
-
+			
 			if (typeof curSVR !== 'undefined' && curSVR.length > 0) {
 				curSVRName = curSVR[0];
 				curSVRRoot = curSVR[1];
@@ -95,7 +97,9 @@ export async function main(ns) {
 				curSVRMaxRam = ns.getServerMaxRam(curSVRName);
 				//ns.tprint(`Checking: ${curSVRName} // Root: ${curSVRRoot} // `);
 				//Let each server run it's own script
-				if (curSVRRoot == true && curSVRMoney > 0 && curSVRMinHack < hackLvl) {
+				
+				if (curSVRRoot && curSVRMoney > 0 && curSVRMinHack < hackLvl) {
+				
 					// we've nuked the server
 
 					threads = Math.floor(curSVRMaxRam / scrHackMem);
@@ -104,12 +108,14 @@ export async function main(ns) {
 						await ns.scp(scrHack, 'home', curSVRName);
 						ns.exec(scrHack, curSVRName, threads, curSVRName);
 						ns.tprint(`// Host: ${curSVRName} // Script: ${scrHack} // ${threads} Threads`)
+						ns.print(`// Host: ${curSVRName} // Script: ${scrHack} // ${threads} Threads`)
 					};
 
 
 
 				} else if (curSVRPorts <= hackCNT) {
 					// we don't have root yet
+					//ns.tprint(`4 S: ${curSVRName} :: ${curSVRRoot} :: P: ${curSVRPorts} :: H: ${curSVRMinHack}/${hackLvl}`)
 					if (hackLvl >= curSVRMinHack) {
 						if (vHacks[0] == 1) { ns.brutessh(curSVRName) };
 						if (vHacks[1] == 1) { ns.ftpcrack(curSVRName) };
@@ -118,6 +124,7 @@ export async function main(ns) {
 						if (vHacks[4] == 1) { ns.relaysmtp(curSVRName) };
 
 						ns.nuke(curSVRName);
+						ns.print(`Nuked: ${curSVRName}`)
 						ns.tprint(`Nuked: ${curSVRName}`)
 						if (curSVRMoney > 0) {
 							threads = Math.floor(curSVRMaxRam / scrHackMem);
@@ -125,6 +132,7 @@ export async function main(ns) {
 							if (threads >= 1) {
 								await ns.scp(scrHack, 'home', curSVRName);
 								ns.exec(scrHack, curSVRName, threads, curSVRName);
+								ns.print(`// Host: ${curSVRName} // Script: ${scrHack} // ${threads} Threads`)
 								ns.tprint(`// Host: ${curSVRName} // Script: ${scrHack} // ${threads} Threads`)
 								await ns.sleep(100)
 							};
@@ -163,7 +171,7 @@ export async function main(ns) {
 							ramAvailable = (curSVRMaxRam - curSVRUsedRam);
 							//ns.tprint(`Name: ${j} - ${pList[j]} :: RAM: ${curSVRMaxRam} :: Used: ${curSVRUsedRam} :: Needed: ${ramNeeded}>${ramAvailable}`);
 
-							if (ramNeeded > ramAvailable) { ns.tprint(`${pList[j]} out of ram :: Needed: ${ramNeeded}>${ramAvailable}`); j++ }; // current pserv is out of available ram, moving to next
+							if (ramNeeded > ramAvailable) { ns.print(`${pList[j]} out of ram :: Needed: ${ramNeeded}>${ramAvailable}`); j++ }; // current pserv is out of available ram, moving to next
 
 							if (j < 2 && j < pList.length) {
 								for (let e = 0; e < threadCap; e++) {
@@ -178,10 +186,10 @@ export async function main(ns) {
 												//ns.tprint('Run: ' + e);
 
 												//if (e == 1) { ns.tprint(`copied ${scrHack} to ${pList[j]}`) };
-												if (hackLvl > curSVR[3] && j < 2) {
+												if (hackLvl > curSVR[3] && j < 2 && curSVR[1]) {
 													await ns.scp(scrHack, 'home', pList[j]);
 													ns.exec(scrHack, pList[j], threadLimit / 2, curSVR[0], e)
-													//if (e == threadCap - 1) { ns.tprint(`Newb: We Attempted to Start ${pList[j]}, ${scrHack}, ${curSVR[0]}, L: ${threadLimit / 2}, C: ${threadCap} // `) };
+													if (e == threadCap - 1) { ns.print(`1 Started: ${pList[j]}, ${scrHack}, ${curSVR[0]}, L: ${threadLimit / 2}, C: ${threadCap} // `) };
 													await ns.sleep(100);
 												}
 
@@ -218,6 +226,7 @@ export async function main(ns) {
 									await ns.scp(scrHack, 'home', pList[j]);
 									//ns.tprint(`copied ${scrHack} to ${pList[j]}`);
 									await ns.run('sendIT.js', 1, scrHack, pList[j], vHighValue[f], threadLimit)
+									ns.print(`HV Started:  ${pList[j]}, ${scrHack}, ${curSVR[0]}, L: ${threadLimit / 2}, C: ${threadCap} //`)
 									await ns.sleep(100);
 									//ns.tprint(`${j}-4+: We Attempted to Start ${pList[j]}, ${scrHack}, ${curSVR[0]}, L: ${threadLimit}, C: ${threadCap}`);
 								};
@@ -232,7 +241,11 @@ export async function main(ns) {
 		}
 		//ns.tprint(`${datetime} :: Finished Populating PSERV`);
 		//ns.tprint('-----------------------------------------------------')
-		await ns.sleep(60000);
+		for (let gg = 0; gg < 60; gg++) {
+			ns.clearLog();
+			ns.print(`Sleeping for ${(60-gg)} seconds.`);
+			await ns.sleep(1000);
+		}
 	}
 
 }

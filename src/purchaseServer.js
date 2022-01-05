@@ -1,6 +1,7 @@
 /** @param {NS} ns **/
 export async function main(ns) {
-
+	var scraptTarget = '';
+	if (ns.args.length == 1) {scraptTarget = ns.args[0]} else {scraptTarget = 'n00dles'}; 
 	var ramToBuy=16;
 	var pServer = "";
 	const serverCostMulti = ns.getPurchasedServerCost(16) / 16;
@@ -8,7 +9,7 @@ export async function main(ns) {
 	const maxMoney = ns.getServerMoneyAvailable('home');
 	const maxRAM = ns.getPurchasedServerMaxRam('home');
 	var scrapt = 'sendIT.js';
-	var scraptTarget = 'n00dles';
+	
 
 	var theChoice = await ns.prompt('Execute ' + scrapt + ' after purchse of new server?');
 

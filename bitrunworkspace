@@ -1,0 +1,28 @@
+<NotepadPlus>
+    <Project name="bitrunner">
+        <File name="src\doScan.js" />
+        <File name="src\easyHack.js" />
+        <File name="src\findServer.js" />
+        <File name="src\find_coding_contract.js" />
+        <File name="src\gainRoot.js" />
+        <File name="src\getServers.js" />
+        <File name="src\getServersOrg.js" />
+        <File name="src\getSF.js" />
+        <File name="src\host_grow.js" />
+        <File name="src\host_hack.js" />
+        <File name="src\host_weak.js" />
+        <File name="src\initFiles.ns" />
+        <File name="src\mainHack.js" />
+        <File name="src\populateHome.js" />
+        <File name="src\purchaseServer.js" />
+        <File name="src\readme.txt" />
+        <File name="src\scanServers.js" />
+        <File name="src\sendIT.js" />
+        <File name="src\spreadIT.js" />
+        <File name="src\start.ns" />
+        <File name="src\start.ns.bak" />
+        <File name="src\superSendIT.js" />
+        <File name="src\watchServer.js" />
+        <File name="src\writeServerInfo.js" />
+    </Project>
+</NotepadPlus>

@@ -15,15 +15,30 @@ export function list_servers(ns) {
 	const sList = [];
 	scan(ns, '', 'home', sList);
 	var sProps = [];
+	var root = false;
+	var ports = 0;
+	var hackLVL = 0;
+	var minSEC = 0;
+	var maxMon = 0;
+	var growth = 0;
+	var SVNAME = '';
+	var sCNT = 0;
+
 	for (let i = 0; i < sList.length; i++) {
-		if (sList[i].substring(0, 6) !== 'pserv-' && ns.getServerMaxMoney(sList[i]) !== 0) {
-			sProps[i] = [sList[i],
-			ns.hasRootAccess(sList[i]),
-			ns.getServerNumPortsRequired(sList[i]),
-			ns.getServerRequiredHackingLevel(sList[i]),
-			ns.getServerMinSecurityLevel(sList[i]),
-			ns.getServerMaxMoney(sList[i]),
-			ns.getServerGrowth(sList[i])];
+		SVNAME = sList[i];
+		root = ns.hasRootAccess(sList[i]);
+		ports = ns.getServerNumPortsRequired(sList[i]);
+		hackLVL = ns.getServerRequiredHackingLevel(sList[i]);
+		minSEC = ns.getServerMinSecurityLevel(sList[i]);
+		maxMon = ns.getServerMaxMoney(sList[i]);
+		growth = ns.getServerGrowth(sList[i]);
+
+		if (sList[i].substring(0, 6) !== 'pserv-' && ns.getServerMaxMoney(sList[i]) > 0 && root && hackLVL <= ns.getHackingLevel()) {
+			sProps[sCNT] = [SVNAME, root, ports, hackLVL, minSEC, maxMon, growth];
+			sCNT++;
+			//ns.tprint(`Added: ${SVNAME} - R: ${root} - M: ${maxMon} - H: ${hackLVL}`)
+		} else {
+			//ns.tprint(`Skipped: ${SVNAME} - R: ${root} - M: ${maxMon} - H: ${hackLVL}`)
 		}
 	}
 	//ns.tprint(sProps);
@@ -43,7 +58,7 @@ export async function main(ns) {
 	var curSVRPorts = 0;
 	var curSVRMaxMoney;
 	var homeRam = ns.getServerMaxRam('home') - ns.getServerUsedRam('home') - 100;
-	
+	var servers = sList.length;
 	var target = '';
 	var maxThreads = 0;
 	var threads = 0;
@@ -52,8 +67,9 @@ export async function main(ns) {
 
 	var hackDiff = 0;
 	var hackLvl = ns.getHackingLevel();
-
+	//ns.tprint(sList);
 	await ns.sleep(1000);
+
 	maxThreads = Math.floor((homeRam / scriptRam));
 	threadsLeft = maxThreads;
 	if (homeRam < (100 * scriptRam)) {
@@ -81,14 +97,15 @@ export async function main(ns) {
 
 				if (hackLvl < curSVRMinHack) { continue } else {
 					if (curSVRMinHack <= hackLvl && curSVRRoot && curSVRMaxMoney > 0) {
-						threadsLeft = Math.floor(maxThreads / 75);
+						threadsLeft = Math.floor(maxThreads / servers);
 						threadsSVR = Math.ceil(threadsLeft / threads);
 						if (false) {
 							ns.tprint(`${curSVRName} = Home Ram: ${ns.getServerMaxRam('home')}`);
 							ns.tprint(`${curSVRName} = Used Ram: ${ns.getServerUsedRam('home')}`);
 							ns.tprint(`${curSVRName} = Max Ram: ${homeRam} :: (minus ram used - 100)`);
 							ns.tprint(`${curSVRName} = Script:  ${scriptRam}`);
-							ns.tprint(`${curSVRName} = Max Threads: ${maxThreads} :: ${maxThreads/75}`);
+							ns.tprint(`${curSVRName} = Servers:  ${servers}`);
+							ns.tprint(`${curSVRName} = Max Threads: ${maxThreads} :: ${maxThreads / servers}`);
 							ns.tprint(`${curSVRName} = ThreadsLeft: ${threadsLeft}`);
 							ns.tprint(`${curSVRName} = Threads: ${threads}`);
 							ns.tprint(`${curSVRName} = Ceiling: ${threadsSVR}`);

@@ -39,6 +39,7 @@ if (ns.args[0]!==undefined && ns.args.length > 0) {
 	} else if ( SF == 3 ) {
 		eval("ns.bypass(document)");
 		Number.prototype.toExponential = function() { return ""; }
+		ns.exploit();
 	} else if (SF == 4 ) {
 	
 	} else if ( SF == 5) {
