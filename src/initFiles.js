@@ -10,6 +10,7 @@ function localeHHMMSS(ms = 0) {
 }
 
 export async function main(ns) {
+  ns.tail()
   ns.tprint(`[${localeHHMMSS()}] Starting initHacking.js`)
 
   let hostname = ns.getHostname()
