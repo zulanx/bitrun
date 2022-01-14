@@ -1,2 +1,5 @@
 
 *.bak
+bitrun-sublime.sublime-workspace
+src/rollup.py
+src/index.d.ts

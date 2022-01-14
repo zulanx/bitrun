@@ -14,7 +14,7 @@ export default function list_servers(ns) {
     scan(ns, '', 'home', list);
     return list;
 }
-/** @param {NS} ns **/
+/** @param {import(".").NS} ns **/
 export async function main(ns) {
     const sList = list_servers(ns);
     var sProps = [];

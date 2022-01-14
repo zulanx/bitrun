@@ -1,4 +1,4 @@
-/** @param {NS} ns **/
+/** @param {import(".").NS} ns **/
 
 function scan(ns, parent, server, list) {
 	const children = ns.scan(server);
@@ -33,6 +33,7 @@ export function list_servers(ns) {
 
 
 export async function main(ns) {
+
 	ns.disableLog('ALL');
 	var scrHack = 'easyHack.js';
 	var freeMem = 0
@@ -41,6 +42,7 @@ export async function main(ns) {
 	var threadCap = 5;
 	var homeRam = 0;
 	var hackLvl = 0;
+	var lastHack = 0;
 	var curSVR = [];
 	var curSVRName = '';
 	var curSVRRoot = '';
@@ -54,22 +56,46 @@ export async function main(ns) {
 	var vHacksName = ['BruteSSH.exe', 'FTPCrack.exe', 'HTTPWorm.exe', 'SQLInject.exe', 'relaySMTP.exe'];
 	var pList = [];
 	var maxThreads = 0;
+	var anotherThread = 0
 	var tList = [];
 	// from highest to lowest
-	var vHighValue = ['ecorp', 'fulcrumassets', 'fulcrumtech', 'megacorp', 'nwo', 'blade', '4sigma', 'kuai-gong', 'defcomm', 'powerhouse-fitness', 'clarkinc', 'b-and-a', 'omnia', 'omnitek', 'stormtech', 'infocomm', 'univ-energy', 'taiyang-digital', 'aerocorp', 'galactic-cyber', 'icarus', 'global-pharm', 'microdyne', 'applied-energetics', 'helios', 'vitalife', 'deltaone', 'nova-med', 'solaris', 'zeus-med', 'titan-labs', 'unitalife', 'zb-def', 'zb-institute', 'snap-fitness', 'lexo-corp', 'syscore', 'alpha-ent', 'rho-construction'];
+	var vHighValue = ['ecorp', 'fulcrumtech', 'megacorp', 'nwo', 'blade', '4sigma', 'kuai-gong', 'defcomm', 'powerhouse-fitness', 'clarkinc', 'b-and-a', 'omnia', 'omnitek', 'stormtech', 'infocomm', 'univ-energy', 'taiyang-digital', 'aerocorp', 'galactic-cyber', 'icarus', 'global-pharm', 'microdyne', 'applied-energetics', 'helios', 'vitalife', 'deltaone', 'nova-med', 'solaris', 'zeus-med', 'titan-labs', 'unitalife', 'zb-def', 'zb-institute', 'snap-fitness', 'lexo-corp', 'syscore', 'alpha-ent', 'rho-construction'];
 	var threads = 1;
 	var ramAvailable = 0;
 	var ramNeeded = 0;
 	var hackCNT = 0;
 	var currentdate = new Date();
 	var datetime = "Last Sync:  @ " + currentdate.getHours() + ":" + currentdate.getMinutes() + ":" + currentdate.getSeconds();
-
+	var hackLastLvl = 0;
+	var homeUsed = 0
+	var logText = ''
+	var serverCNT = 0
+	var looper = 0
+	var hackable = false;
 
 	while (true) {
+		var logText = ''
 		//sList = list_servers(ns);
 		var sList = list_servers(ns);
 		homeRam = ns.getServerMaxRam('home');
 		hackLvl = ns.getHackingLevel();
+
+		if (hackLvl > (hackLastLvl + 100) || (homeRam - ns.getServerUsedRam('home') - 100) / homeRam > .25) {
+			if (!ns.isRunning('populateHome.js', 'home')) {
+
+				hackLastLvl = Math.floor((hackLvl / 100)) * 100;
+				ns.run('killSCRIPT.js', 1, 'home', scrHack)
+				ns.print(`Killing all currently running ${scrHack} scripts on Home`);
+				var logText = logText + `Killing all currently running ${scrHack} scripts on Home`
+				await ns.sleep(5000);
+				ns.run('populateHome.js', 1);
+			} else {
+				ns.print(`Error: home is already being repopulated. H: ${hackLvl} || L: ${hackLastLvl}`)
+				var logText = logText + `\n` + `Error: home is already being repopulated. H: ${hackLvl} || L: ${hackLastLvl}`
+			};
+
+		}
+
 		// Load Available Hacks
 		hackCNT = 0
 		for (let g = 0; g < 5; g++) {
@@ -77,15 +103,17 @@ export async function main(ns) {
 
 		}
 		ns.print(`${hackCNT} hacks loaded...`)
+		var logText = logText + `\n` + `${hackCNT} hacks loaded...`
 		//ns.tprint('Current Server List\n------------------------------------')
 		//ns.tprint(sList);
 		ns.print(`Processing Individual Game Servers...`)
+		var logText = logText + `\n` + `Processing Individual Game Servers...`
 		for (let i = 0; i < sList.length; i++) {
 			freeMem = homeRam - ns.getServerUsedRam('home') - 100;
 			curSVR = sList[i];
 			//ns.tprint(`Checking: ${curSVR}`);
 			//populate server details
-			
+
 			if (typeof curSVR !== 'undefined' && curSVR.length > 0) {
 				curSVRName = curSVR[0];
 				curSVRRoot = curSVR[1];
@@ -97,9 +125,9 @@ export async function main(ns) {
 				curSVRMaxRam = ns.getServerMaxRam(curSVRName);
 				//ns.tprint(`Checking: ${curSVRName} // Root: ${curSVRRoot} // `);
 				//Let each server run it's own script
-				
+
 				if (curSVRRoot && curSVRMoney > 0 && curSVRMinHack < hackLvl) {
-				
+
 					// we've nuked the server
 
 					threads = Math.floor(curSVRMaxRam / scrHackMem);
@@ -109,6 +137,7 @@ export async function main(ns) {
 						ns.exec(scrHack, curSVRName, threads, curSVRName);
 						ns.tprint(`// Host: ${curSVRName} // Script: ${scrHack} // ${threads} Threads`)
 						ns.print(`// Host: ${curSVRName} // Script: ${scrHack} // ${threads} Threads`)
+						var logText = logText + `\n` + `// Host: ${curSVRName} // Script: ${scrHack} // ${threads} Threads`
 					};
 
 
@@ -126,6 +155,7 @@ export async function main(ns) {
 						ns.nuke(curSVRName);
 						ns.print(`Nuked: ${curSVRName}`)
 						ns.tprint(`Nuked: ${curSVRName}`)
+						var logText = logText + `\n` + `Nuked: ${curSVRName}`
 						if (curSVRMoney > 0) {
 							threads = Math.floor(curSVRMaxRam / scrHackMem);
 							// if the server has money, copy then run the script with max threads available at itself.
@@ -134,6 +164,7 @@ export async function main(ns) {
 								ns.exec(scrHack, curSVRName, threads, curSVRName);
 								ns.print(`// Host: ${curSVRName} // Script: ${scrHack} // ${threads} Threads`)
 								ns.tprint(`// Host: ${curSVRName} // Script: ${scrHack} // ${threads} Threads`)
+								var logText = logText + `\n` + `// Host: ${curSVRName} // Script: ${scrHack} // ${threads} Threads`
 								await ns.sleep(100)
 							};
 						}
@@ -151,101 +182,112 @@ export async function main(ns) {
 		pList = ns.getPurchasedServers();
 		var tList = list_servers(ns);
 		var y = 0
-		for (let j = 0; j < pList.length; j++) {
-			if (y >= tList.length) { y = 0; }
-			if (j < 2) {
-				//ns.tprint(`Made it into <4 :${j}: ${pList[j]}`);
-				for (y; y < tList.length; y++) {
-					if (j >= pList.length) { continue };
-					curSVR = tList[y];
-					//ns.tprint(curSVR);
-					if (j < 2) {
-						if (typeof curSVR !== 'undefined' && curSVR.length > 0) {
-							curSVRUsedRam = ns.getServerUsedRam(pList[j]);
-							curSVRMaxRam = ns.getServerMaxRam(pList[j]);
-
-
-							//ns.tprint(`Checking: ${curSVR}`)
-							//ns.tprint(curSVR[3] + '::Ram Needed: ' + (scrHackMem * threadLimit * threadCap) + ':: Ram Available: ' + curSVRUsedRam);
-							ramNeeded = (scrHackMem * threadLimit / 2 * threadCap);
-							ramAvailable = (curSVRMaxRam - curSVRUsedRam);
-							//ns.tprint(`Name: ${j} - ${pList[j]} :: RAM: ${curSVRMaxRam} :: Used: ${curSVRUsedRam} :: Needed: ${ramNeeded}>${ramAvailable}`);
-
-							if (ramNeeded > ramAvailable) { ns.print(`${pList[j]} out of ram :: Needed: ${ramNeeded}>${ramAvailable}`); j++ }; // current pserv is out of available ram, moving to next
-
-							if (j < 2 && j < pList.length) {
-								for (let e = 0; e < threadCap; e++) {
-									maxThreads = Math.floor((curSVRMaxRam - curSVRUsedRam) / scrHackMem);
-									if (j < 2 && j < pList.length) {
-										curSVRUsedRam = ns.getServerUsedRam(pList[j]);
-										curSVRMaxRam = ns.getServerMaxRam(pList[j]);
-										ramNeeded = (scrHackMem * threadLimit / 2 * threadCap);
-										ramAvailable = (curSVRMaxRam - curSVRUsedRam);
-										if (ramNeeded <= ramAvailable) {
-											if (ns.isRunning(scrHack, pList[j], [curSVR[0], e]) == false) {
-												//ns.tprint('Run: ' + e);
-
-												//if (e == 1) { ns.tprint(`copied ${scrHack} to ${pList[j]}`) };
-												if (hackLvl > curSVR[3] && j < 2 && curSVR[1]) {
-													await ns.scp(scrHack, 'home', pList[j]);
-													ns.exec(scrHack, pList[j], threadLimit / 2, curSVR[0], e)
-													if (e == threadCap - 1) { ns.print(`1 Started: ${pList[j]}, ${scrHack}, ${curSVR[0]}, L: ${threadLimit / 2}, C: ${threadCap} // `) };
-													await ns.sleep(100);
-												}
-
-												//ns.tprint(`Script: ${scrHack} // Host: ${pList[0]} // Target: ${curSVR[0]} // ${threadLimit} Threads`);
-
-
-											}
-										}
-									}
-
-								}
-							}
-
-						}
-					}
-				}
-			} else if (j >= 2 && j <= 24) {
-				//ns.tprint(`Made it into >=4 (HV) :${j}: ${pList[j]}`);
-				if (j >= pList.length) { continue };
-				//for high value targets
-				//work through high value list, highest to lowest
-				for (let f = 0; f < vHighValue.length; f++) {
-					for (let z = 0; z < tList.length; z++) {
-						curSVR = tList[z];
-						if (typeof curSVR !== 'undefined' && curSVR.length > 0) {
-							if (j >= pList.length) { continue };
-							curSVRUsedRam = ns.getServerUsedRam(pList[j]);
-							curSVRMaxRam = ns.getServerMaxRam(pList[j]);
-							if (curSVRUsedRam > 0) { j++ }
-							if (curSVR[0] == vHighValue[f]) { // if current pserv is out of ram, move next, then check to see if Target Min hack is over 500
-								//ns.tprint(`3R :: [${curSVR}] :: HLVL: ${hackLvl}/${curSVR[3]} :: Root: ${curSVR[1]}`);
-								if (curSVR[1] && curSVR[3] <= hackLvl) {
-									//ns.tprint('4R');
-									await ns.scp(scrHack, 'home', pList[j]);
-									//ns.tprint(`copied ${scrHack} to ${pList[j]}`);
-									await ns.run('sendIT.js', 1, scrHack, pList[j], vHighValue[f], threadLimit)
-									ns.print(`HV Started:  ${pList[j]}, ${scrHack}, ${curSVR[0]}, L: ${threadLimit / 2}, C: ${threadCap} //`)
-									await ns.sleep(100);
-									//ns.tprint(`${j}-4+: We Attempted to Start ${pList[j]}, ${scrHack}, ${curSVR[0]}, L: ${threadLimit}, C: ${threadCap}`);
-								};
-
-
-							}
-						}
-					}
+		if (pList.length > 0 && (hackLvl - lastHack) >= 100) {
+			serverCNT = 0
+			for (let hh = 0; hh < tList.length; hh++) {
+				curSVR = tList[hh]
+				if (ns.getHackingLevel() >= ns.getServerRequiredHackingLevel(curSVR[0]) && ns.getServerMaxMoney(curSVR[0]) > 0 && ns.hasRootAccess(curSVR[0])) {
+					serverCNT++
 				}
 
 			}
+			ns.tprint(`Killing PSERVs for repopulation: ${hackLvl}/${lastHack}`);
+			ns.print(`Killing PSERVs for repopulation: ${hackLvl}/${lastHack}`);
+			var logText = logText + `\n` + `Killing PSERVs for repopulation: ${hackLvl}/${lastHack}`
+			for (let uu = 0; uu < pList.length && uu < 2; uu++) {
+				ns.killall(pList[uu]);
+			}
+			ns.print(`Hackable Servers: ${serverCNT}`)
+			var logText = logText + `\n` + `Hackable Servers: ${serverCNT}`
+
+			// Populate pserv 0-1
+			for (let j = 0; j < pList.length && j < 2; j++) {
+
+				curSVRUsedRam = ns.getServerUsedRam(pList[j]);
+				curSVRMaxRam = ns.getServerMaxRam(pList[j]);
+				maxThreads = Math.floor((curSVRMaxRam - curSVRUsedRam) / serverCNT);
+				if ((curSVRUsedRam / curSVRMaxRam) <= .5) {
+
+					await ns.scp(scrHack, 'home', pList[j]);
+					for (let s = 0; s < tList.length; s++) {
+						curSVR = tList[s];
+						if (ns.getHackingLevel() >= ns.getServerRequiredHackingLevel(curSVR[0]) && ns.getServerMaxMoney(curSVR[0]) > 0 && ns.hasRootAccess(curSVR[0])) {
+							threads = Math.floor(maxThreads / 40)
+
+							for (let xx = 0; xx < 40; xx++) {
+								//ns.tprint(`starting ${scrHack}, ${pList[j]},${threads},${curSVR[0]},${xx}`)
+								await ns.sleep(50)
+								await ns.exec(scrHack, pList[j], threads, curSVR[0], xx)
+							}
+						}
+
+					}
+
+				}
+
+
+			}
+			ns.print(`Finished Populating PSERV 0/1`)
+			var logText = logText + `\n` + `Finished Populating PSERV 0/1`
+			lastHack = hackLvl;
+		} else if (pList.length > 0 && (hackLvl - lastHack) < 100) {
+			ns.print(`Last hack below 100, Skipping pserv populate`)
+			var logText = logText + `\n` + `Last hack below 100, Skipping pserv populate`
+		} else {
+			ns.print(`No purchased servers found`)
+			var logText = logText + `\n` + `No purchased servers found`
 		}
+
+		
+		// Populate pserv 2-24
+		//ns.tprint(`Onto 2+ Plist: ${pList.length}`)
+		for (let rr = 2; rr < pList.length; rr++) {
+			if (ns.getServerUsedRam(pList[rr]) == 0) {
+				hackable = true;
+			}
+		}
+
+
+		for (let j = 2; j < pList.length && hackable; j++) {
+			//ns.tprint(`Working Plist: ${pList[j]}`)
+			for (let f = 0; f < vHighValue.length; f++) {
+				//ns.tprint(`Working HV: ${vHighValue[f]}`)
+				if (j < pList.length) {
+					if (ns.getHackingLevel() >= ns.getServerRequiredHackingLevel(vHighValue[f]) && ns.getServerMaxMoney(vHighValue[f]) > 0 && ns.hasRootAccess(vHighValue[f])) {
+						ns.killall(pList[j]);
+						await ns.sleep(100);
+						await ns.scp(scrHack, 'home', pList[j]);
+						//ns.tprint(`copied ${scrHack} to ${pList[j]}`);
+						await ns.run('sendIT.js', 1, scrHack, pList[j], vHighValue[f], threadLimit)
+						ns.print(`HV Started:  ${pList[j]}, ${scrHack}, ${vHighValue[f]}, L: ${threadLimit}, C: ${threadCap} //`)
+						var logText = logText + `\n` + `HV Started:  ${pList[j]}, ${scrHack}, ${vHighValue[f]}, L: ${threadLimit}, C: ${threadCap} //`
+						await ns.sleep(100);
+						j++;
+					}
+					if (f == (vHighValue.length - 1) && j < pList.length) {
+						f = 0;
+					}
+				}
+			}
+		}
+		ns.print(`Finished Populating PSERV 2+ (Hackable: ${hackable})`)
+		var logText = logText + `\n` + `Finished Populating PSERV 2+ (Hackable: ${hackable})`
+
+
+
+
+
 		//ns.tprint(`${datetime} :: Finished Populating PSERV`);
 		//ns.tprint('-----------------------------------------------------')
+		looper++;
+		hackable = false;
 		for (let gg = 0; gg < 60; gg++) {
 			ns.clearLog();
-			ns.print(`Sleeping for ${(60-gg)} seconds.`);
-			await ns.sleep(1000);
-		}
-	}
 
+			ns.print(logText + `\n${hackLvl}/${lastHack}\n` + `Run: ${looper} :: Sleeping for ${(60 - gg)} seconds.`);
+			await ns.sleep(1000);
+
+		}
+
+	}
 }

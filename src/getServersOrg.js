@@ -1,4 +1,4 @@
-/** @type {NS} ns **/
+/** @param {import(".").NS} ns **/
 export function getAllServers(ns, rootHost = 'home') {
 	ns.disableLog('scan')
 	let pendingScan = [rootHost]

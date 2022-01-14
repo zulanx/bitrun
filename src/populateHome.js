@@ -1,4 +1,4 @@
-/** @param {NS} ns **/
+/** @param {import(".").NS} ns **/
 
 function scan(ns, parent, server, list) {
 	const children = ns.scan(server);
@@ -47,6 +47,7 @@ export function list_servers(ns) {
 
 export async function main(ns) {
 
+
 	var scrapt = 'easyHack.js';
 	var threadFactor = 100;
 	var scriptRam = ns.getScriptRam(scrapt);
@@ -67,15 +68,36 @@ export async function main(ns) {
 
 	var hackDiff = 0;
 	var hackLvl = ns.getHackingLevel();
+
+	if (homeRam < 1024) {
+		threadFactor = 10;
+	 } else  if (homeRam >= 1024 && homeRam <= 8192) {
+		 threadFactor= 100;
+	 } else if (homeRam >= 8193 && homeRam <=65536) {
+
+	 } else if (homeRam > 65536) {
+		 threadFactor = 300
+	 } else {
+		 threadFactor = 100
+	 }
+
 	//ns.tprint(sList);
 	await ns.sleep(1000);
 
 	maxThreads = Math.floor((homeRam / scriptRam));
 	threadsLeft = maxThreads;
-	if (homeRam < (100 * scriptRam)) {
-		ns.tprint(`Not enough ram on home machine, min: ${scriptRam * 500}`)
+	if (homeRam < (threadFactor * scriptRam)) {
+		ns.tprint(`Not enough ram on home machine, min: ${scriptRam * threadFactor}`)
 	} else {
-
+		if (ns.args.length == 1) {
+			if (ns.args[0] == 'kill') {
+				ns.run('killSCRIPT.js', 1, 'home', scrapt)
+				ns.print(`Killing all currently running ${scrapt} scripts on Home`);
+				await ns.sleep(10000);
+				ns.run('populateHome.js', 1);
+				return 0;
+			}
+		}
 		for (let i = 0; i < sList.length; i++) {
 
 			if (sList[i] !== undefined) {
@@ -95,7 +117,7 @@ export async function main(ns) {
 
 				threads = threadFactor * hackDiff;
 
-				if (hackLvl < curSVRMinHack) { continue } else {
+				if (hackLvl < curSVRMinHack) {  } else {
 					if (curSVRMinHack <= hackLvl && curSVRRoot && curSVRMaxMoney > 0) {
 						threadsLeft = Math.floor(maxThreads / servers);
 						threadsSVR = Math.ceil(threadsLeft / threads);

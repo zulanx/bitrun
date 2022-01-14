@@ -1,4 +1,4 @@
-/** @param {NS} ns **/
+/** @param {import(".").NS} ns **/
 export async function main(ns) {
 	var scraptTarget = '';
 	if (ns.args.length == 1) {scraptTarget = ns.args[0]} else {scraptTarget = 'n00dles'}; 
@@ -11,7 +11,7 @@ export async function main(ns) {
 	var scrapt = 'sendIT.js';
 	
 
-	var theChoice = await ns.prompt('Execute ' + scrapt + ' after purchse of new server?');
+	var theChoice = false; //await ns.prompt('Execute ' + scrapt + ' after purchse of new server?');
 
 	if (maxMoney > serverCostMulti * ramToBuy) {
 		ramToBuy *= 2;
@@ -32,10 +32,10 @@ export async function main(ns) {
 			if (!ns.serverExists('pserv-' + i) || ns.getServerMaxRam('pserv-' + i) < ramToBuy) {
 				if (ns.serverExists('pserv-' + i)) {
 					ns.killall('pserv-'+i);
-					await ns.sleep(8000);
+					await ns.sleep(1000);
 					ns.tprint('Killing Server: pserv-' +i)
 					ns.deleteServer('pserv-'+i);
-					await ns.sleep(5000);
+					await ns.sleep(1000);
 				}
                 if (!ns.serverExists('pserv-' + i)) {
                     pServer = ns.purchaseServer('pserv-' + i, ramToBuy);
@@ -49,12 +49,12 @@ export async function main(ns) {
 						++i;
                     }
                 }
-                await ns.sleep(500);
+                await ns.sleep(100);
             } else {
                 ++i;
-                await ns.sleep(500);
+                await ns.sleep(100);
             }
         }
-        await ns.sleep(500);
+        await ns.sleep(100);
     }
 }

@@ -1,4 +1,4 @@
-/** @param {NS} ns **/
+/** @param {import(".").NS} ns **/
 
 function hideElem(elem) {
 	// Make elem invisible

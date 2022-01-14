@@ -1,7 +1,7 @@
 import { getAllServers } from "getServersOrg.js";
 
 /** 
- * @param {NS} ns
+ * @param {import(".").NS} ns 
  * @param {string} str The string
  * @param {number} len The number
  * **/

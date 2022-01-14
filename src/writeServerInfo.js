@@ -1,3 +1,5 @@
+/** @param {import(".").NS} ns **/
+
 function scan(ns, parent, server, list) {
     const children = ns.scan(server);
     for (let child of children) {
@@ -14,7 +16,7 @@ export function list_servers(ns) {
     scan(ns, '', 'home', list);
     return list;
 }
-/** @param {NS} ns **/
+
 export async function main(ns) {
     const sList = list_servers(ns);
     var sProps = [];

@@ -1,4 +1,5 @@
-/** @param {NS} ns **/
+/** @param {import(".").NS} ns **/
+
 export async function main(ns) {
 	var depth = 3;
 	var target = ns.args[0];
@@ -33,9 +34,7 @@ export async function main(ns) {
 		}
 	}
 
-	for (let u = 0; u < srv.length; u++) {
-		ns.tprint(srv[u]);
-	}
+
 	ns.tprint('Network Mapped With ' + srv.length + ' servers.');
 
 
@@ -68,7 +67,7 @@ export async function main(ns) {
 			await ns.scp(scrapt, 'home', hostname);
 			ns.exec(scrapt, hostname, threads, target);
 			ns.tprint('Success! Started: ' + hostname + ' :: ' + threads + ' threads. :: Target: ' + target)
-			await ns.sleep(500);
+			await ns.sleep(100);
 		} else {
 
 			skippedServers += hostname + ', '
