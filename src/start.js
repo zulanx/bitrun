@@ -4,8 +4,8 @@ export async function main(ns) {
   }
 
   await ns.wget(
-    `https://raw.githubusercontent.com/zulanx/bitrun/main/src/initFiles.ns?ts=${new Date().getTime()}`,
+    `https://raw.githubusercontent.com/zulanx/bitrun/main/src/initFiles.js?ts=${new Date().getTime()}`,
     "initFiles.ns"
   );
-  ns.spawn("initFiles.ns", 1);
+  ns.spawn("initFiles.js", 1);
 }
