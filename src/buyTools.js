@@ -20,12 +20,12 @@ export async function main(ns) {
     var totalHacks = 0;
     var curTOOL = [];
 
-    if (ns.purchaseTor) { toolsCNT[10] = 1; ns.print(`TOR Router has been purchased`) } else { toolsCNT[10] = 0 };
+//    if (ns.purchaseTor) { toolsCNT[10] = 1; ns.print(`TOR Router has been purchased`) } else { toolsCNT[10] = 0 };
     for (let i = 0; i < tools.length; i++) {
         curTOOL = tools[i];
         if (ns.fileExists(curTOOL[0])) { toolsCNT[i] = 1; ns.print(`Found: ${curTOOL[0]}`) } else { toolsCNT[i] = 0 };
     }
-
+    await ns.sleep(2000);
     while (true) {
         totalHacks = 0;
         hackLVL = ns.getHackingLevel();
@@ -41,29 +41,41 @@ export async function main(ns) {
                 totalHacks = 0;
                 hackLVL = ns.getHackingLevel();
                 playerMoney = ns.getServerMoneyAvailable('home');
+                ns.print(`check: ${toolsCNT}`)
+                await ns.sleep(2000);
                 for (let h = 0; h < tools.length; h++) {
                     curTOOL = tools[h];
-                    if (!ns.fileExists(curTOOL[0]) && playerMoney >= curTOOL[1] && hackLVL >= curTOOL[2]) { ns.purchaseProgram(curTOOL[0]); toolsCNT[h] = 1; ns.print(`Purchased: ${curTOOL[0]}`) };
-                }
-                totalHacks = 0;
-                ns.print(`1. checking how many tools we have`)
-                ns.print(toolsCNT);
-                for (let f = 0; f < toolsCNT.length; f++) {
-                    totalHacks += toolsCNT[f];
-                }
-                ns.print(totalHacks)
-                if (totalHacks == 11) {
-                    break;
-                } else {
-
-                    for (let s = 0; s < 60; s++) {
-                        ns.clearLog()
-                        for (let d = 0; d < tools.length; d++) {
-                            curTOOL = tools[d];
-                            ns.print(`[${toolsCNT[d]}] ${curTOOL[0]} `)
+                    if (!ns.fileExists(curTOOL[0]) && playerMoney >= curTOOL[1] && hackLVL >= curTOOL[2]) {
+                        if (ns.purchaseProgram(curTOOL[0])) {
+                            toolsCNT[h] = 1;
+                            ns.print(`Purchased: ${curTOOL[0]}`)
+                            await ns.sleep(2000);
+                        } else {
+                            ns.print(`Failed Purchase: ${curTOOL[0]} ... WHY?`);
+                            await ns.sleep(2000);
                         }
-                        ns.print(`Sleeping for ${60 - s} seconds.`)
-                        await ns.sleep(1000);
+                    }
+
+                    totalHacks = 0;
+                    ns.print(`1. checking how many tools we have`)
+                    ns.print(toolsCNT);
+                    for (let f = 0; f < toolsCNT.length; f++) {
+                        totalHacks += toolsCNT[f];
+                    }
+                    ns.print(totalHacks)
+                    if (totalHacks == 11) {
+                        break;
+                    } else {
+
+                        for (let s = 0; s < 60; s++) {
+                            ns.clearLog()
+                            for (let d = 0; d < tools.length; d++) {
+                                curTOOL = tools[d];
+                                ns.print(`[${toolsCNT[d]}] ${curTOOL[0]} `)
+                            }
+                            ns.print(`Sleeping for ${60 - s} seconds.`)
+                            await ns.sleep(1000);
+                        }
                     }
                 }
             }
