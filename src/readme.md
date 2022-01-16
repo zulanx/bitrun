@@ -1,5 +1,5 @@
 Create New Script to initiate download.
-
+Save as start.js
 ---------------------------------------------------------------------------------------------------------------------
 ```
 export async function main(ns) {
@@ -16,13 +16,21 @@ export async function main(ns) {
 ```
 ---------------------------------------------------------------------------------------------------------------------
 
+spreadIT.js should be run when starting out, mainHack.js can auto nuke servers, but will not populate home or pservs until much later.
+
 initFiles.js - download all of these scripts with wget from githubusercontent: Should be downloaded and started automatically from above script.
 	- ex. 'run initFiles.ns'
+
+1startPurchase.js - Starts mainHack.js, starts buyTools.js, starts purchaseServer.js after criteria is met
+	- run 1startPurchase.js
 
 easyHack.js - Auto Hack/Weak/Grow   
 	- easyHack.js -t <threads> <target>
 	- ex. 'run easyHack.js -t 20 n00dles'
-	
+mainHack.js - Main management script for automatically nuking, and populating Purchased Servers and Home.
+	- run mainHack.js
+buyTools.js - will monitor and purchase tor+hacking tools. SF4 required
+	- run buyTools.js
 gainRoot.js - Exploit/Nuke Target, send easyHack script against new target when complete. 
 	- gainRoot.js <target> <attackTarget>
 	- ex. 'run gainRoot.js joesguns n00dles'
